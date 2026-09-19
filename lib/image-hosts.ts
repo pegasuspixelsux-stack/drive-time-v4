@@ -3,7 +3,10 @@
 // user-supplied image URL is accepted (e.g. the inventory Add/Edit form)
 // should validate against this same list before it's ever persisted, since
 // next/image throws at render time for a host that isn't allow-listed here.
-export const ALLOWED_IMAGE_HOSTS = ["images.unsplash.com"] as const;
+export const ALLOWED_IMAGE_HOSTS = [
+  "images.unsplash.com",
+  "firebasestorage.googleapis.com",
+] as const;
 
 export type AllowedImageHost = (typeof ALLOWED_IMAGE_HOSTS)[number];
 
