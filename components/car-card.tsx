@@ -13,12 +13,6 @@ const currency = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
 });
 
-const currencyPrecise = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  maximumFractionDigits: 2,
-});
-
 const mileageFormat = new Intl.NumberFormat("en-US");
 
 const ESTIMATE_APR = 6.5;
@@ -120,7 +114,7 @@ export function CarCard({
             </p>
             <div className="text-right sm:text-left">
               <p className="text-[1.3rem] font-semibold leading-none text-foreground">
-                {currencyPrecise.format(estimateMonthlyPayment(car.price))}
+                {currency.format(estimateMonthlyPayment(car.price))}
                 <span className="hidden sm:inline">/mes</span>
               </p>
               <p className="mt-0.5 text-[0.7rem] text-muted sm:hidden">/mes</p>
@@ -195,7 +189,7 @@ export function CarCard({
             {currency.format(car.price)}
           </p>
           <p className="text-[1.2rem] font-semibold leading-none text-white">
-            {currencyPrecise.format(estimateMonthlyPayment(car.price))}
+            {currency.format(estimateMonthlyPayment(car.price))}
             <span className="text-[0.75rem] font-normal text-white/70">/mes</span>
           </p>
         </div>

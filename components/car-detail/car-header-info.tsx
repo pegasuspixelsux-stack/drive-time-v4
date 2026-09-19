@@ -6,12 +6,6 @@ const currency = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
 });
 
-const currencyPrecise = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  maximumFractionDigits: 2,
-});
-
 const DETAIL_APR = 6.9;
 const DETAIL_TERM_MONTHS = 60;
 const DETAIL_DOWN_RATE = 0.3;
@@ -38,7 +32,7 @@ export function CarHeaderInfo({ car }: { car: Car }) {
 
         <div className="text-left sm:text-right">
           <p className="text-3xl font-semibold tracking-tight text-zinc-900">
-            {currencyPrecise.format(monthly)}
+            {currency.format(monthly)}
             <span className="text-base font-normal text-zinc-500">/mes</span>
           </p>
           <p className="mt-1 text-[0.9rem] text-zinc-500">

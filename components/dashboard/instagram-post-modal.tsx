@@ -48,12 +48,6 @@ const currency = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
 });
 
-const currencyPrecise = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  maximumFractionDigits: 2,
-});
-
 const mileageFormat = new Intl.NumberFormat("en-US");
 
 const PAYMENT_APR = 6.9;
@@ -91,7 +85,7 @@ function isColorDark([r, g, b]: [number, number, number]): boolean {
 }
 
 function defaultPriceText(item: InventoryItem) {
-  return `${currencyPrecise.format(estimateMonthlyPayment(item.price))}/mes`;
+  return `${currency.format(estimateMonthlyPayment(item.price))}/mes`;
 }
 
 const PADDING = 56;

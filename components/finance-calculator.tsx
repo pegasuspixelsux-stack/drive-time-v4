@@ -12,12 +12,6 @@ const currency = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
 });
 
-const currencyPrecise = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  maximumFractionDigits: 2,
-});
-
 function monthlyPayment(
   principal: number,
   annualRatePercent: number,
@@ -117,7 +111,7 @@ export function FinanceCalculator() {
             transition={{ duration: 0.25, ease: "easeOut" }}
             className="mt-2 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl"
           >
-            {currencyPrecise.format(Number.isFinite(payment) ? payment : 0)}
+            {currency.format(Number.isFinite(payment) ? payment : 0)}
           </motion.p>
           <p className="mt-1 text-[0.8rem] text-muted-2">por mes</p>
         </div>
