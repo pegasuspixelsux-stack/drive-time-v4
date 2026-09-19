@@ -5,8 +5,10 @@ import { motion } from "framer-motion";
 import { Car, Target, DollarSign, Mail } from "lucide-react";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { StatusPill } from "@/components/dashboard/status-pill";
-import { useLocalStorage } from "@/lib/use-local-storage";
-import { seedInventory, seedLeads, seedMessages, type InventoryStatus } from "@/lib/dashboard-data";
+import { useInventory } from "@/lib/firebase/inventory";
+import { useLeads } from "@/lib/firebase/leads";
+import { useMessages } from "@/lib/firebase/messages";
+import { type InventoryStatus } from "@/lib/dashboard-data";
 import { fadeUp, staggerContainer } from "@/lib/motion";
 
 const currency = new Intl.NumberFormat("en-US", {
@@ -28,9 +30,9 @@ const STATUS_LABELS: Record<InventoryStatus, string> = {
 };
 
 export default function ControlPanelPage() {
-  const [inventory] = useLocalStorage("dt_inventory", seedInventory);
-  const [leads] = useLocalStorage("dt_leads", seedLeads);
-  const [messages] = useLocalStorage("dt_messages", seedMessages);
+  const { items: inventory } = useInventory();
+  const { items: leads } = useLeads();
+  const { items: messages } = useMessages();
 
   const activeLeads = leads.filter((lead) => lead.status !== "Won").length;
   const monthlyRevenue = inventory
@@ -52,6 +54,7 @@ export default function ControlPanelPage() {
       timestamp: message.receivedAt,
     })),
   ]
+    .filter((item) => item.timestamp)
     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
     .slice(0, 6);
 
