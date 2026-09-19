@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Grid2x2, LayoutGrid } from "lucide-react";
 import { cars } from "@/data/cars";
-import { CarCard } from "@/components/car-card";
+import { CarCard, type CardLayout } from "@/components/car-card";
 import { fadeUp, staggerContainer } from "@/lib/motion";
 
 const BODY_TYPE_PILLS = ["All", "Sedan", "SUV", "Coupe"] as const;
@@ -25,6 +25,9 @@ export function CarGrid() {
 
   const visibleCars =
     bodyType === "All" ? cars : cars.filter((car) => car.bodyType === bodyType);
+
+  const cardLayout: CardLayout =
+    density === "comfortable" ? "split" : "portrait";
 
   return (
     <section id="inventory" className="bg-background px-3 pb-28 pt-[5%] sm:px-6 lg:px-8">
@@ -105,7 +108,7 @@ export function CarGrid() {
           }`}
         >
           {visibleCars.map((car) => (
-            <CarCard key={car.id} car={car} />
+            <CarCard key={car.id} car={car} layout={cardLayout} />
           ))}
         </motion.div>
 

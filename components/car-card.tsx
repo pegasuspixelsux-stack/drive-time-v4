@@ -44,8 +44,92 @@ function estimateMonthlyPayment(price: number) {
   return (principal * (monthlyRate * factor)) / (factor - 1);
 }
 
-export function CarCard({ car }: { car: Car }) {
+export type CardLayout = "split" | "portrait";
+
+export function CarCard({
+  car,
+  layout = "portrait",
+}: {
+  car: Car;
+  layout?: CardLayout;
+}) {
   const FuelIcon = car.fuelType === "Electric" ? Zap : Fuel;
+
+  if (layout === "split") {
+    return (
+      <motion.article
+        variants={fadeUp}
+        className="group relative flex flex-row overflow-hidden rounded-2xl bg-transparent"
+      >
+        <Link
+          href={`/inventory/${car.id}`}
+          aria-label="Ver detalles"
+          className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-border-strong bg-surface text-foreground transition-colors duration-200 ease-out group-hover:border-foreground/40 group-hover:bg-foreground group-hover:text-accent-foreground"
+        >
+          <ArrowUpRight
+            size={16}
+            className="transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+          />
+        </Link>
+
+        <div className="relative aspect-square w-2/5 flex-shrink-0 self-start overflow-hidden bg-surface-2 sm:aspect-auto sm:w-1/2 sm:self-stretch">
+          <Image
+            src={car.image}
+            alt={`${car.year} ${car.make} ${car.model} ${car.trim}`}
+            fill
+            sizes="(min-width: 640px) 25vw, 40vw"
+            className="object-cover object-[center_33%] transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-[1.08]"
+          />
+          <span className="glass absolute left-3 top-3 rounded-full px-3 py-1 text-[0.75rem] font-medium text-foreground">
+            {BODY_TYPE_LABELS[car.bodyType] ?? car.bodyType}
+          </span>
+        </div>
+
+        <div className="flex flex-1 flex-col gap-2 p-5 sm:gap-4">
+          <div>
+            <h3 className="text-[1.05rem] font-semibold leading-tight text-foreground">
+              {car.make} {car.model}
+            </h3>
+            <div className="mt-0.5 hidden items-center gap-1.5 text-[0.85rem] text-muted sm:flex">
+              <span
+                className="h-3 w-3 flex-shrink-0 rounded-full border border-border-strong"
+                style={{ backgroundColor: car.colorHex }}
+              />
+              <span>{car.color}</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 pt-1 text-[0.78rem] text-muted sm:grid-cols-3 sm:border-t sm:border-border sm:pt-4">
+            <div className="flex items-center gap-1.5">
+              <Calendar size={14} />
+              <span>{car.year}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Gauge size={14} />
+              <span>{mileageFormat.format(car.mileage)} km</span>
+            </div>
+            <div className="hidden items-center gap-1.5 sm:flex">
+              <FuelIcon size={14} />
+              <span>{FUEL_TYPE_LABELS[car.fuelType] ?? car.fuelType}</span>
+            </div>
+          </div>
+
+          <div className="mt-auto flex items-end justify-between gap-3 pt-1 sm:border-t sm:border-border sm:pt-4">
+            <p className="whitespace-nowrap text-[0.8rem] text-muted">
+              {currency.format(car.price)}
+            </p>
+            <div className="text-right sm:text-left">
+              <p className="text-[1.3rem] font-semibold leading-none text-foreground">
+                {currencyPrecise.format(estimateMonthlyPayment(car.price))}
+                <span className="hidden sm:inline">/mes</span>
+              </p>
+              <p className="mt-0.5 text-[0.7rem] text-muted sm:hidden">/mes</p>
+            </div>
+          </div>
+        </div>
+      </motion.article>
+    );
+  }
 
   return (
     <motion.article
@@ -57,7 +141,7 @@ export function CarCard({ car }: { car: Car }) {
         alt={`${car.year} ${car.make} ${car.model} ${car.trim}`}
         fill
         sizes="(min-width: 1024px) 22vw, (min-width: 640px) 45vw, 90vw"
-        className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-[1.08]"
+        className="object-cover object-[center_33%] transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-[1.08]"
       />
 
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.9)_0%,rgba(0,0,0,0.9)_15%,rgba(0,0,0,0)_33%)]" />
