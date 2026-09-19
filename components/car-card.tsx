@@ -60,7 +60,7 @@ export function CarCard({ car }: { car: Car }) {
         className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-[1.08]"
       />
 
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.9)_0%,rgba(0,0,0,0)_33%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.9)_0%,rgba(0,0,0,0.9)_15%,rgba(0,0,0,0)_33%)]" />
 
       <span className="glass absolute left-3 top-3 z-10 rounded-full px-3 py-1 text-[0.75rem] font-medium text-white">
         {BODY_TYPE_LABELS[car.bodyType] ?? car.bodyType}
