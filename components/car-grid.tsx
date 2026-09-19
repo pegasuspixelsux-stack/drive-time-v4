@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { LayoutGrid, Rows3 } from "lucide-react";
 import { cars } from "@/data/cars";
-import { CarCard } from "@/components/car-card";
+import { CarCard, type CardLayout } from "@/components/car-card";
 import { fadeUp, staggerContainer } from "@/lib/motion";
 
 const BODY_TYPE_PILLS = ["All", "Sedan", "SUV", "Coupe"] as const;
@@ -18,6 +19,7 @@ const BODY_TYPE_LABELS: Record<(typeof BODY_TYPE_PILLS)[number], string> = {
 export function CarGrid() {
   const [bodyType, setBodyType] =
     useState<(typeof BODY_TYPE_PILLS)[number]>("All");
+  const [cardLayout, setCardLayout] = useState<CardLayout>("horizontal");
 
   const visibleCars =
     bodyType === "All" ? cars : cars.filter((car) => car.bodyType === bodyType);
@@ -41,21 +43,52 @@ export function CarGrid() {
           </p>
         </motion.div>
 
-        <div className="mb-8 flex flex-wrap gap-2">
-          {BODY_TYPE_PILLS.map((type) => (
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap gap-2">
+            {BODY_TYPE_PILLS.map((type) => (
+              <button
+                key={type}
+                type="button"
+                onClick={() => setBodyType(type)}
+                className={`rounded-full border px-4 py-2 text-[0.85rem] font-medium transition-colors duration-200 ${
+                  bodyType === type
+                    ? "border-foreground bg-foreground text-accent-foreground"
+                    : "border-border-strong text-muted hover:text-foreground"
+                }`}
+              >
+                {BODY_TYPE_LABELS[type]}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex shrink-0 items-center gap-1 rounded-full border border-border-strong p-1">
             <button
-              key={type}
               type="button"
-              onClick={() => setBodyType(type)}
-              className={`rounded-full border px-4 py-2 text-[0.85rem] font-medium transition-colors duration-200 ${
-                bodyType === type
-                  ? "border-foreground bg-foreground text-accent-foreground"
-                  : "border-border-strong text-muted hover:text-foreground"
+              aria-label="Vista horizontal"
+              aria-pressed={cardLayout === "horizontal"}
+              onClick={() => setCardLayout("horizontal")}
+              className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors duration-200 ${
+                cardLayout === "horizontal"
+                  ? "bg-foreground text-accent-foreground"
+                  : "text-muted hover:text-foreground"
               }`}
             >
-              {BODY_TYPE_LABELS[type]}
+              <Rows3 size={16} />
             </button>
-          ))}
+            <button
+              type="button"
+              aria-label="Vista vertical"
+              aria-pressed={cardLayout === "vertical"}
+              onClick={() => setCardLayout("vertical")}
+              className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors duration-200 ${
+                cardLayout === "vertical"
+                  ? "bg-foreground text-accent-foreground"
+                  : "text-muted hover:text-foreground"
+              }`}
+            >
+              <LayoutGrid size={16} />
+            </button>
+          </div>
         </div>
 
         <motion.div
@@ -63,10 +96,14 @@ export function CarGrid() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-80px" }}
-          className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-2"
+          className={`grid gap-3 sm:gap-6 ${
+            cardLayout === "vertical"
+              ? "grid-cols-2 md:grid-cols-4"
+              : "grid-cols-1 md:grid-cols-2"
+          }`}
         >
           {visibleCars.map((car) => (
-            <CarCard key={car.id} car={car} />
+            <CarCard key={car.id} car={car} layout={cardLayout} />
           ))}
         </motion.div>
 

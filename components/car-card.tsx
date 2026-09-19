@@ -44,13 +44,24 @@ function estimateMonthlyPayment(price: number) {
   return (principal * (monthlyRate * factor)) / (factor - 1);
 }
 
-export function CarCard({ car }: { car: Car }) {
+export type CardLayout = "horizontal" | "vertical";
+
+export function CarCard({
+  car,
+  layout = "horizontal",
+}: {
+  car: Car;
+  layout?: CardLayout;
+}) {
   const FuelIcon = car.fuelType === "Electric" ? Zap : Fuel;
+  const isVertical = layout === "vertical";
 
   return (
     <motion.article
       variants={fadeUp}
-      className="group relative flex flex-row overflow-hidden rounded-2xl bg-transparent"
+      className={`group relative flex overflow-hidden rounded-2xl bg-transparent ${
+        isVertical ? "flex-col" : "flex-row"
+      }`}
     >
       <Link
         href={`/inventory/${car.id}`}
@@ -63,12 +74,22 @@ export function CarCard({ car }: { car: Car }) {
         />
       </Link>
 
-      <div className="relative aspect-square w-2/5 flex-shrink-0 self-start overflow-hidden bg-surface-2 sm:aspect-auto sm:w-1/2 sm:self-stretch">
+      <div
+        className={
+          isVertical
+            ? "relative aspect-[4/3] w-full flex-shrink-0 overflow-hidden bg-surface-2"
+            : "relative aspect-square w-2/5 flex-shrink-0 self-start overflow-hidden bg-surface-2 sm:aspect-auto sm:w-1/2 sm:self-stretch"
+        }
+      >
         <Image
           src={car.image}
           alt={`${car.year} ${car.make} ${car.model} ${car.trim}`}
           fill
-          sizes="(min-width: 640px) 25vw, 40vw"
+          sizes={
+            isVertical
+              ? "(min-width: 768px) 25vw, 50vw"
+              : "(min-width: 640px) 25vw, 40vw"
+          }
           className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-[1.08]"
         />
         <span className="glass absolute left-3 top-3 rounded-full px-3 py-1 text-[0.75rem] font-medium text-foreground">
