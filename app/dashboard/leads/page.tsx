@@ -34,7 +34,7 @@ function formatDate(value: string) {
 }
 
 export default function LeadsPage() {
-  const { items: leads, loading, updateStatus, deleteLead } = useLeads();
+  const { items: leads, loading, error, updateStatus, deleteLead } = useLeads();
   const [statusFilter, setStatusFilter] = useState<LeadStatus | "All">("All");
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
@@ -107,6 +107,13 @@ export default function LeadsPage() {
               <tr>
                 <td colSpan={6} className="px-5 py-6 text-center text-sm text-slate-500">
                   Cargando prospectos…
+                </td>
+              </tr>
+            )}
+            {!loading && error && (
+              <tr>
+                <td colSpan={6} className="px-5 py-6 text-center text-sm text-red-600">
+                  No se pudo cargar — intenta de nuevo.
                 </td>
               </tr>
             )}

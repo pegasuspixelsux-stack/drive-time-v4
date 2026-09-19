@@ -24,7 +24,7 @@ const STATUS_LABELS: Record<TeamUser["status"], string> = {
 };
 
 export default function UsersPage() {
-  const { items: users, loading, addUser, updateRole, deleteUser } = useTeamUsers();
+  const { items: users, loading, error, addUser, updateRole, deleteUser } = useTeamUsers();
   const [modalOpen, setModalOpen] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [draft, setDraft] = useState({ name: "", email: "", role: "Sales" as TeamRole });
@@ -86,6 +86,13 @@ export default function UsersPage() {
               <tr>
                 <td colSpan={4} className="px-5 py-6 text-center text-sm text-slate-500">
                   Cargando usuarios…
+                </td>
+              </tr>
+            )}
+            {!loading && error && (
+              <tr>
+                <td colSpan={4} className="px-5 py-6 text-center text-sm text-red-600">
+                  No se pudo cargar — intenta de nuevo.
                 </td>
               </tr>
             )}

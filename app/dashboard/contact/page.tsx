@@ -20,7 +20,7 @@ function formatTimestamp(value: string) {
 }
 
 export default function ContactPage() {
-  const { items: messages, loading, markRead, deleteMessage } = useMessages();
+  const { items: messages, loading, error, markRead, deleteMessage } = useMessages();
   const [activeId, setActiveId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
@@ -55,6 +55,8 @@ export default function ContactPage() {
       <motion.div variants={fadeUp} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         {loading ? (
           <p className="px-5 py-6 text-center text-sm text-slate-500">Cargando mensajes…</p>
+        ) : error ? (
+          <p className="px-5 py-6 text-center text-sm text-red-600">No se pudo cargar — intenta de nuevo.</p>
         ) : (
           <ul className="divide-y divide-slate-100">
             {messages.map((message) => (

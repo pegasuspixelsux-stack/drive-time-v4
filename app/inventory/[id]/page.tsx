@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
-import { getInventoryOnce } from "@/lib/firebase/inventory";
+import { getInventoryOnce } from "@/lib/firebase/inventory-read";
 import type { InventoryItem } from "@/lib/dashboard-data";
 import { carDetails, buildFallbackDetail } from "@/data/car-details";
 import { CarSlideshow } from "@/components/car-detail/car-slideshow";

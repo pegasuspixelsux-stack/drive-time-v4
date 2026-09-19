@@ -34,6 +34,22 @@ const STATUS_LABELS: Record<InventoryStatus, string> = {
   Sold: "Vendido",
 };
 
+const BODY_TYPE_OPTIONS: InventoryItem["bodyType"][] = ["Sedan", "SUV", "Coupe"];
+
+const BODY_TYPE_LABELS: Record<InventoryItem["bodyType"], string> = {
+  Sedan: "Sedán",
+  SUV: "SUV",
+  Coupe: "Cupé",
+};
+
+const FUEL_TYPE_OPTIONS: InventoryItem["fuelType"][] = ["Gasoline", "Hybrid", "Electric"];
+
+const FUEL_TYPE_LABELS: Record<InventoryItem["fuelType"], string> = {
+  Gasoline: "Nafta",
+  Hybrid: "Híbrido",
+  Electric: "Eléctrico",
+};
+
 type DraftVehicle = {
   make: string;
   model: string;
@@ -43,6 +59,11 @@ type DraftVehicle = {
   mileage: string;
   status: InventoryStatus;
   image: string;
+  transmission: string;
+  fuelType: InventoryItem["fuelType"];
+  bodyType: InventoryItem["bodyType"];
+  color: string;
+  colorHex: string;
 };
 
 const EMPTY_DRAFT: DraftVehicle = {
@@ -54,6 +75,11 @@ const EMPTY_DRAFT: DraftVehicle = {
   mileage: "",
   status: "Available",
   image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1600&q=80",
+  transmission: "Automatic",
+  fuelType: "Gasoline",
+  bodyType: "Sedan",
+  color: "Jet Black",
+  colorHex: "#0a0a0b",
 };
 
 function toDraft(item: InventoryItem): DraftVehicle {
@@ -66,11 +92,16 @@ function toDraft(item: InventoryItem): DraftVehicle {
     mileage: String(item.mileage),
     status: item.status,
     image: item.image,
+    transmission: item.transmission,
+    fuelType: item.fuelType,
+    bodyType: item.bodyType,
+    color: item.color,
+    colorHex: item.colorHex,
   };
 }
 
 export default function InventoryPage() {
-  const { items: inventory, loading, addVehicle, updateVehicle, deleteVehicle } = useInventory();
+  const { items: inventory, loading, error, addVehicle, updateVehicle, deleteVehicle } = useInventory();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<InventoryStatus | "All">("All");
   const [modalOpen, setModalOpen] = useState(false);
@@ -147,6 +178,11 @@ export default function InventoryPage() {
         mileage: Number(draft.mileage) || existing?.mileage || 0,
         status: draft.status,
         image: trimmedImage || existing?.image || EMPTY_DRAFT.image,
+        transmission: draft.transmission.trim() || existing?.transmission || EMPTY_DRAFT.transmission,
+        fuelType: draft.fuelType || existing?.fuelType || EMPTY_DRAFT.fuelType,
+        bodyType: draft.bodyType || existing?.bodyType || EMPTY_DRAFT.bodyType,
+        color: draft.color.trim() || existing?.color || EMPTY_DRAFT.color,
+        colorHex: draft.colorHex.trim() || existing?.colorHex || EMPTY_DRAFT.colorHex,
       });
     } else {
       const newItem: InventoryItem = {
@@ -157,11 +193,11 @@ export default function InventoryPage() {
         year: Number(draft.year) || new Date().getFullYear(),
         price: Number(draft.price) || 0,
         mileage: Number(draft.mileage) || 0,
-        transmission: "Automatic",
-        fuelType: "Gasoline",
-        bodyType: "Sedan",
-        color: "Jet Black",
-        colorHex: "#0a0a0b",
+        transmission: draft.transmission.trim() || EMPTY_DRAFT.transmission,
+        fuelType: draft.fuelType,
+        bodyType: draft.bodyType,
+        color: draft.color.trim() || EMPTY_DRAFT.color,
+        colorHex: draft.colorHex.trim() || EMPTY_DRAFT.colorHex,
         status: draft.status,
         image: trimmedImage || EMPTY_DRAFT.image,
       };
@@ -246,6 +282,13 @@ export default function InventoryPage() {
               <tr>
                 <td colSpan={6} className="px-5 py-6 text-center text-sm text-slate-500">
                   Cargando inventario…
+                </td>
+              </tr>
+            )}
+            {!loading && error && (
+              <tr>
+                <td colSpan={6} className="px-5 py-6 text-center text-sm text-red-600">
+                  No se pudo cargar — intenta de nuevo.
                 </td>
               </tr>
             )}
@@ -340,6 +383,33 @@ export default function InventoryPage() {
               ))}
             </select>
           </DashboardField>
+          <div className="grid grid-cols-2 gap-4">
+            <DashboardField label="Carrocería">
+              <select value={draft.bodyType} onChange={(e) => setDraft((d) => ({ ...d, bodyType: e.target.value as InventoryItem["bodyType"] }))} className={dashboardInputClass}>
+                {BODY_TYPE_OPTIONS.map((bodyType) => (
+                  <option key={bodyType} value={bodyType}>{BODY_TYPE_LABELS[bodyType]}</option>
+                ))}
+              </select>
+            </DashboardField>
+            <DashboardField label="Combustible">
+              <select value={draft.fuelType} onChange={(e) => setDraft((d) => ({ ...d, fuelType: e.target.value as InventoryItem["fuelType"] }))} className={dashboardInputClass}>
+                {FUEL_TYPE_OPTIONS.map((fuelType) => (
+                  <option key={fuelType} value={fuelType}>{FUEL_TYPE_LABELS[fuelType]}</option>
+                ))}
+              </select>
+            </DashboardField>
+          </div>
+          <DashboardField label="Transmisión">
+            <input value={draft.transmission} onChange={(e) => setDraft((d) => ({ ...d, transmission: e.target.value }))} className={dashboardInputClass} />
+          </DashboardField>
+          <div className="grid grid-cols-2 gap-4">
+            <DashboardField label="Color">
+              <input value={draft.color} onChange={(e) => setDraft((d) => ({ ...d, color: e.target.value }))} className={dashboardInputClass} />
+            </DashboardField>
+            <DashboardField label="Código de Color (Hex)">
+              <input value={draft.colorHex} onChange={(e) => setDraft((d) => ({ ...d, colorHex: e.target.value }))} className={dashboardInputClass} />
+            </DashboardField>
+          </div>
           <DashboardField label="Subir Imagen">
             <input
               type="file"

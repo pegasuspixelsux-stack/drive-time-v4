@@ -6,6 +6,7 @@ import { Grid2x2, LayoutGrid } from "lucide-react";
 import { useInventory } from "@/lib/firebase/inventory";
 import { CarCard, type CardLayout } from "@/components/car-card";
 import { fadeUp, staggerContainer } from "@/lib/motion";
+import type { InventoryItem } from "@/lib/dashboard-data";
 
 const BODY_TYPE_PILLS = ["All", "Sedan", "SUV", "Coupe"] as const;
 
@@ -18,8 +19,8 @@ const BODY_TYPE_LABELS: Record<(typeof BODY_TYPE_PILLS)[number], string> = {
 
 type GridDensity = "comfortable" | "compact";
 
-export function CarGrid() {
-  const { items: cars, loading } = useInventory();
+export function CarGrid({ initialCars }: { initialCars?: InventoryItem[] }) {
+  const { items: cars, loading, error } = useInventory(initialCars);
   const [bodyType, setBodyType] =
     useState<(typeof BODY_TYPE_PILLS)[number]>("All");
   const [density, setDensity] = useState<GridDensity>("comfortable");
@@ -96,6 +97,10 @@ export function CarGrid() {
             </button>
           </div>
         </div>
+
+        {error && (
+          <p className="text-center text-sm text-muted">No se pudo cargar el inventario — intenta de nuevo.</p>
+        )}
 
         <motion.div
           variants={staggerContainer}
