@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { CheckCircle2, MessageCircle, Send } from "lucide-react";
 import type { Car } from "@/data/cars";
 import { fadeUp } from "@/lib/motion";
+import { createLead } from "@/lib/firebase/leads";
 
 const WHATSAPP_NUMBER = "14155550148";
 
@@ -31,6 +32,18 @@ function buildWhatsAppUrl(car: Car, draft: InquiryDraft) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join(" "))}`;
 }
 
+function recordLead(car: Car, draft: InquiryDraft) {
+  void createLead({
+    name: draft.name.trim(),
+    email: draft.email.trim(),
+    phone: draft.phone.trim(),
+    interestedIn: `${car.year} ${car.make} ${car.model}`,
+    source: "Sitio web",
+  }).catch((error) => {
+    console.warn("No se pudo guardar el prospecto:", error);
+  });
+}
+
 export function CarInquiryForm({ car }: { car: Car }) {
   const [draft, setDraft] = useState<InquiryDraft>(EMPTY_DRAFT);
   const [errors, setErrors] = useState<Partial<Record<keyof InquiryDraft, string>>>({});
@@ -48,11 +61,13 @@ export function CarInquiryForm({ car }: { car: Car }) {
   const handleEmailSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!validate()) return;
+    recordLead(car, draft);
     setSubmitted(true);
   };
 
   const handleWhatsAppSubmit = () => {
     if (!validate()) return;
+    recordLead(car, draft);
     window.open(buildWhatsAppUrl(car, draft), "_blank", "noreferrer");
   };
 

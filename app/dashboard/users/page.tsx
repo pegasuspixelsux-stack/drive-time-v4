@@ -6,8 +6,8 @@ import { Plus, Trash2 } from "lucide-react";
 import { Modal } from "@/components/dashboard/modal";
 import { StatusPill } from "@/components/dashboard/status-pill";
 import { DashboardField, dashboardInputClass } from "@/components/dashboard/form-field";
-import { useLocalStorage } from "@/lib/use-local-storage";
-import { seedUsers, type TeamRole, type TeamUser } from "@/lib/dashboard-data";
+import { useTeamUsers } from "@/lib/firebase/users";
+import { type TeamRole, type TeamUser } from "@/lib/dashboard-data";
 import { fadeUp, staggerContainer } from "@/lib/motion";
 
 const ROLES: TeamRole[] = ["Admin", "Manager", "Sales"];
@@ -24,7 +24,7 @@ const STATUS_LABELS: Record<TeamUser["status"], string> = {
 };
 
 export default function UsersPage() {
-  const [users, setUsers] = useLocalStorage("dt_users", seedUsers);
+  const { items: users, loading, error, addUser, updateRole, deleteUser } = useTeamUsers();
   const [modalOpen, setModalOpen] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [draft, setDraft] = useState({ name: "", email: "", role: "Sales" as TeamRole });
@@ -33,29 +33,23 @@ export default function UsersPage() {
 
   const initials = (name: string) => name.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase();
 
-  const updateRole = (id: string, role: TeamRole) => {
-    setUsers((prev) => prev.map((user) => (user.id === id ? { ...user, role } : user)));
-  };
-
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirmDeleteId !== id) {
       setConfirmDeleteId(id);
       return;
     }
-    setUsers((prev) => prev.filter((user) => user.id !== id));
+    await deleteUser(id);
     setConfirmDeleteId(null);
   };
 
-  const handleInvite = () => {
+  const handleInvite = async () => {
     if (!isDraftValid) return;
-    const newUser: TeamUser = {
-      id: `user-${Date.now()}`,
+    await addUser({
       name: draft.name.trim(),
       email: draft.email.trim(),
       role: draft.role,
       status: "Invited",
-    };
-    setUsers((prev) => [...prev, newUser]);
+    });
     setDraft({ name: "", email: "", role: "Sales" });
     setModalOpen(false);
   };
@@ -88,7 +82,21 @@ export default function UsersPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {users.map((user) => (
+            {loading && (
+              <tr>
+                <td colSpan={4} className="px-5 py-6 text-center text-sm text-slate-500">
+                  Cargando usuarios…
+                </td>
+              </tr>
+            )}
+            {!loading && error && (
+              <tr>
+                <td colSpan={4} className="px-5 py-6 text-center text-sm text-red-600">
+                  No se pudo cargar — intenta de nuevo.
+                </td>
+              </tr>
+            )}
+            {!loading && users.map((user) => (
               <tr key={user.id}>
                 <td className="px-5 py-3">
                   <div className="flex items-center gap-3">

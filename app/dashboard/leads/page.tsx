@@ -4,8 +4,8 @@ import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Trash2 } from "lucide-react";
 import { StatusPill } from "@/components/dashboard/status-pill";
-import { useLocalStorage } from "@/lib/use-local-storage";
-import { seedLeads, type LeadStatus } from "@/lib/dashboard-data";
+import { useLeads } from "@/lib/firebase/leads";
+import { type LeadStatus } from "@/lib/dashboard-data";
 import { fadeUp, staggerContainer } from "@/lib/motion";
 
 const STATUS_FILTERS: Array<LeadStatus | "All"> = ["All", "New", "Contacted", "Negotiating", "Won"];
@@ -26,8 +26,15 @@ const STATUS_LABELS: Record<LeadStatus | "All", string> = {
   Won: "Ganado",
 };
 
+function formatDate(value: string) {
+  if (!value) return "";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+  return parsed.toLocaleDateString("es-ES", { year: "numeric", month: "short", day: "numeric" });
+}
+
 export default function LeadsPage() {
-  const [leads, setLeads] = useLocalStorage("dt_leads", seedLeads);
+  const { items: leads, loading, error, updateStatus, deleteLead } = useLeads();
   const [statusFilter, setStatusFilter] = useState<LeadStatus | "All">("All");
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
@@ -47,16 +54,12 @@ export default function LeadsPage() {
 
   const filtered = statusFilter === "All" ? leads : leads.filter((lead) => lead.status === statusFilter);
 
-  const updateStatus = (id: string, status: LeadStatus) => {
-    setLeads((prev) => prev.map((lead) => (lead.id === id ? { ...lead, status } : lead)));
-  };
-
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirmDeleteId !== id) {
       setConfirmDeleteId(id);
       return;
     }
-    setLeads((prev) => prev.filter((lead) => lead.id !== id));
+    await deleteLead(id);
     setConfirmDeleteId(null);
   };
 
@@ -100,7 +103,21 @@ export default function LeadsPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {filtered.map((lead) => (
+            {loading && (
+              <tr>
+                <td colSpan={6} className="px-5 py-6 text-center text-sm text-slate-500">
+                  Cargando prospectos…
+                </td>
+              </tr>
+            )}
+            {!loading && error && (
+              <tr>
+                <td colSpan={6} className="px-5 py-6 text-center text-sm text-red-600">
+                  No se pudo cargar — intenta de nuevo.
+                </td>
+              </tr>
+            )}
+            {!loading && filtered.map((lead) => (
               <tr key={lead.id}>
                 <td className="px-5 py-3">
                   <p className="font-medium text-slate-900">{lead.name}</p>
@@ -123,7 +140,7 @@ export default function LeadsPage() {
                     </select>
                   </div>
                 </td>
-                <td className="px-5 py-3 text-slate-500">{lead.createdAt}</td>
+                <td className="px-5 py-3 text-slate-500">{formatDate(lead.createdAt)}</td>
                 <td className="px-5 py-3 text-right">
                   <button
                     type="button"

@@ -1,3 +1,5 @@
+import type { Car } from "@/data/cars";
+
 export interface CarDetailImage {
   src: string;
   alt: string;
@@ -484,3 +486,11 @@ export const carDetails: Record<string, CarDetail> = {
     ],
   },
 };
+
+export function buildFallbackDetail(car: Car): CarDetail {
+  return {
+    images: [{ src: car.image, alt: `${car.year} ${car.make} ${car.model} ${car.trim}` }],
+    editorial: { headline: "", dek: "", paragraphs: [] },
+    features: [],
+  };
+}

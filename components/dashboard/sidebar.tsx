@@ -11,7 +11,7 @@ import {
   Settings,
   LogOut,
 } from "lucide-react";
-import { getCurrentUser, logout } from "@/lib/auth";
+import { logout, type CurrentUser } from "@/lib/auth";
 
 const NAV_LINKS = [
   { label: "Panel de Control", href: "/dashboard", icon: LayoutDashboard },
@@ -21,18 +21,17 @@ const NAV_LINKS = [
   { label: "Usuarios", href: "/dashboard/users", icon: Users },
 ];
 
-export function Sidebar() {
+export function Sidebar({ currentUser }: { currentUser: CurrentUser }) {
   const pathname = usePathname();
   const router = useRouter();
-  const user = getCurrentUser();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.push("/login");
   };
 
   const initials =
-    user.name
+    currentUser.name
       .split(" ")
       .map((part) => part[0])
       .join("")
@@ -83,8 +82,8 @@ export function Sidebar() {
             {initials}
           </span>
           <div className="hidden min-w-0 flex-1 lg:block">
-            <p className="truncate text-sm font-medium text-slate-900">{user.name}</p>
-            <p className="truncate text-xs text-slate-500">{user.role}</p>
+            <p className="truncate text-sm font-medium text-slate-900">{currentUser.name}</p>
+            <p className="truncate text-xs text-slate-500">{currentUser.role}</p>
           </div>
         </div>
         <div className="mt-2 flex flex-col items-center gap-1 lg:flex-row">

@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { login } from "@/lib/auth";
+import { login, friendlyAuthError } from "@/lib/auth";
 import { fadeUp, staggerContainer } from "@/lib/motion";
 
 export default function LoginPage() {
@@ -13,8 +13,9 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const nextErrors: { email?: string; password?: string } = {};
     if (!email.trim()) nextErrors.email = "El correo electrónico es obligatorio";
@@ -22,8 +23,15 @@ export default function LoginPage() {
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
-    login(email.trim());
-    router.push("/dashboard");
+    setSubmitting(true);
+    try {
+      await login(email.trim(), password);
+      router.push("/dashboard");
+    } catch (error) {
+      setErrors({ password: friendlyAuthError(error) });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -123,12 +131,13 @@ export default function LoginPage() {
 
             <motion.button
               type="submit"
+              disabled={submitting}
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
               transition={{ duration: 0.15, ease: "easeOut" }}
-              className="mt-2 flex h-12 items-center justify-center rounded-xl bg-foreground text-[0.9rem] font-medium text-accent-foreground"
+              className="mt-2 flex h-12 items-center justify-center rounded-xl bg-foreground text-[0.9rem] font-medium text-accent-foreground disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Iniciar sesión
+              {submitting ? "Iniciando sesión…" : "Iniciar sesión"}
             </motion.button>
           </motion.form>
 
