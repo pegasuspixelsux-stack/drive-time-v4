@@ -29,7 +29,7 @@ export function CarSlideshow({ images }: { images: CarDetailImage[] }) {
 
   return (
     <div className="mx-auto max-w-[1000px] px-6 pt-8 sm:px-8">
-      <div className="relative aspect-[16/10] w-full overflow-hidden rounded-3xl bg-zinc-100 shadow-lg">
+      <div className="relative aspect-square w-full overflow-hidden rounded-3xl bg-zinc-100 shadow-lg">
         <motion.div
           className="flex h-full w-full cursor-grab active:cursor-grabbing"
           drag="x"
@@ -47,7 +47,7 @@ export function CarSlideshow({ images }: { images: CarDetailImage[] }) {
                 alt={image.alt}
                 fill
                 sizes="(min-width: 1024px) 1000px, 100vw"
-                className="pointer-events-none object-cover"
+                className="pointer-events-none object-cover object-[center_33%]"
                 priority={i === 0}
               />
             </div>
