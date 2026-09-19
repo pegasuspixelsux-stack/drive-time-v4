@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
 import { FormField, FormInput, FormSelect } from "@/components/form-controls";
+import { createLead } from "@/lib/firebase/leads";
 
 const CONDITIONS = ["Excelente", "Bueno", "Regular", "Necesita reparaciones"];
 
@@ -13,6 +14,24 @@ export function TradeInForm() {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const make = String(formData.get("make") ?? "");
+    const model = String(formData.get("model") ?? "");
+    const year = String(formData.get("year") ?? "");
+    const name = String(formData.get("name") ?? "");
+    const email = String(formData.get("email") ?? "");
+    const phone = String(formData.get("phone") ?? "");
+
+    void createLead({
+      name,
+      email,
+      phone,
+      interestedIn: `${make} ${model} ${year} (trade-in, ${condition})`,
+      source: "Sitio web",
+    }).catch((error) => {
+      console.warn("No se pudo guardar el prospecto:", error);
+    });
+
     setSubmitted(true);
   };
 
