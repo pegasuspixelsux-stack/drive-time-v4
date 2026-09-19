@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { LayoutGrid, Rows3 } from "lucide-react";
+import { Grid2x2, LayoutGrid } from "lucide-react";
 import { cars } from "@/data/cars";
-import { CarCard, type CardLayout } from "@/components/car-card";
+import { CarCard } from "@/components/car-card";
 import { fadeUp, staggerContainer } from "@/lib/motion";
 
 const BODY_TYPE_PILLS = ["All", "Sedan", "SUV", "Coupe"] as const;
@@ -16,10 +16,12 @@ const BODY_TYPE_LABELS: Record<(typeof BODY_TYPE_PILLS)[number], string> = {
   Coupe: "Cupé",
 };
 
+type GridDensity = "comfortable" | "compact";
+
 export function CarGrid() {
   const [bodyType, setBodyType] =
     useState<(typeof BODY_TYPE_PILLS)[number]>("All");
-  const [cardLayout, setCardLayout] = useState<CardLayout>("horizontal");
+  const [density, setDensity] = useState<GridDensity>("comfortable");
 
   const visibleCars =
     bodyType === "All" ? cars : cars.filter((car) => car.bodyType === bodyType);
@@ -64,24 +66,24 @@ export function CarGrid() {
           <div className="flex shrink-0 items-center gap-1 rounded-full border border-border-strong p-1">
             <button
               type="button"
-              aria-label="Vista horizontal"
-              aria-pressed={cardLayout === "horizontal"}
-              onClick={() => setCardLayout("horizontal")}
+              aria-label="Vista amplia"
+              aria-pressed={density === "comfortable"}
+              onClick={() => setDensity("comfortable")}
               className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors duration-200 ${
-                cardLayout === "horizontal"
+                density === "comfortable"
                   ? "bg-foreground text-accent-foreground"
                   : "text-muted hover:text-foreground"
               }`}
             >
-              <Rows3 size={16} />
+              <Grid2x2 size={16} />
             </button>
             <button
               type="button"
-              aria-label="Vista vertical"
-              aria-pressed={cardLayout === "vertical"}
-              onClick={() => setCardLayout("vertical")}
+              aria-label="Vista compacta"
+              aria-pressed={density === "compact"}
+              onClick={() => setDensity("compact")}
               className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors duration-200 ${
-                cardLayout === "vertical"
+                density === "compact"
                   ? "bg-foreground text-accent-foreground"
                   : "text-muted hover:text-foreground"
               }`}
@@ -97,13 +99,13 @@ export function CarGrid() {
           whileInView="visible"
           viewport={{ once: true, margin: "-80px" }}
           className={`grid gap-3 sm:gap-6 ${
-            cardLayout === "vertical"
+            density === "compact"
               ? "grid-cols-2 md:grid-cols-4"
               : "grid-cols-1 md:grid-cols-2"
           }`}
         >
           {visibleCars.map((car) => (
-            <CarCard key={car.id} car={car} layout={cardLayout} />
+            <CarCard key={car.id} car={car} />
           ))}
         </motion.div>
 
