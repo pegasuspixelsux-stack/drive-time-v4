@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Grid2x2, LayoutGrid } from "lucide-react";
-import { cars } from "@/data/cars";
+import { useInventory } from "@/lib/firebase/inventory";
 import { CarCard, type CardLayout } from "@/components/car-card";
 import { fadeUp, staggerContainer } from "@/lib/motion";
 
@@ -19,6 +19,7 @@ const BODY_TYPE_LABELS: Record<(typeof BODY_TYPE_PILLS)[number], string> = {
 type GridDensity = "comfortable" | "compact";
 
 export function CarGrid() {
+  const { items: cars, loading } = useInventory();
   const [bodyType, setBodyType] =
     useState<(typeof BODY_TYPE_PILLS)[number]>("All");
   const [density, setDensity] = useState<GridDensity>("comfortable");
@@ -43,7 +44,7 @@ export function CarGrid() {
             Inventario Destacado
           </h2>
           <p className="mt-3 max-w-md text-[0.95rem] text-muted">
-            Nueve vehículos seleccionados a mano, cada uno inspeccionado y
+            Vehículos seleccionados a mano, cada uno inspeccionado y
             certificado antes de llegar a ti.
           </p>
         </motion.div>
@@ -107,7 +108,7 @@ export function CarGrid() {
               : "grid-cols-1 md:grid-cols-2"
           }`}
         >
-          {visibleCars.map((car) => (
+          {!loading && visibleCars.map((car) => (
             <CarCard key={car.id} car={car} layout={cardLayout} />
           ))}
         </motion.div>
