@@ -8,8 +8,9 @@ import { Modal } from "@/components/dashboard/modal";
 import { StatusPill } from "@/components/dashboard/status-pill";
 import { DashboardField, dashboardInputClass } from "@/components/dashboard/form-field";
 import { InstagramPostModal } from "@/components/dashboard/instagram-post-modal";
-import { useLocalStorage } from "@/lib/use-local-storage";
-import { seedInventory, type InventoryItem, type InventoryStatus } from "@/lib/dashboard-data";
+import { useInventory } from "@/lib/firebase/inventory";
+import { uploadInventoryImage } from "@/lib/firebase/storage";
+import type { InventoryItem, InventoryStatus } from "@/lib/dashboard-data";
 import { fadeUp, staggerContainer } from "@/lib/motion";
 import { ALLOWED_IMAGE_HOSTS, isAllowedImageUrl } from "@/lib/image-hosts";
 
@@ -69,13 +70,15 @@ function toDraft(item: InventoryItem): DraftVehicle {
 }
 
 export default function InventoryPage() {
-  const [inventory, setInventory] = useLocalStorage("dt_inventory", seedInventory);
+  const { items: inventory, loading, addVehicle, updateVehicle, deleteVehicle } = useInventory();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<InventoryStatus | "All">("All");
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [draftId, setDraftId] = useState<string>("");
   const [draft, setDraft] = useState<DraftVehicle>(EMPTY_DRAFT);
   const [errors, setErrors] = useState<{ image?: string }>({});
+  const [uploading, setUploading] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [instagramItem, setInstagramItem] = useState<InventoryItem | null>(null);
   const [instagramOpen, setInstagramOpen] = useState(false);
@@ -94,6 +97,7 @@ export default function InventoryPage() {
 
   const openAddModal = () => {
     setEditingId(null);
+    setDraftId(`vehicle-${Date.now()}`);
     setDraft(EMPTY_DRAFT);
     setErrors({});
     setModalOpen(true);
@@ -101,12 +105,26 @@ export default function InventoryPage() {
 
   const openEditModal = (item: InventoryItem) => {
     setEditingId(item.id);
+    setDraftId(item.id);
     setDraft(toDraft(item));
     setErrors({});
     setModalOpen(true);
   };
 
-  const handleSave = () => {
+  const handleImageUpload = async (file: File) => {
+    setUploading(true);
+    setErrors({});
+    try {
+      const url = await uploadInventoryImage(file, draftId);
+      setDraft((d) => ({ ...d, image: url }));
+    } catch {
+      setErrors({ image: "No se pudo subir la imagen. Intenta de nuevo." });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSave = async () => {
     if (!isDraftValid) return;
 
     const trimmedImage = draft.image.trim();
@@ -119,26 +137,20 @@ export default function InventoryPage() {
     setErrors({});
 
     if (editingId) {
-      setInventory((prev) =>
-        prev.map((item) =>
-          item.id === editingId
-            ? {
-                ...item,
-                make: draft.make.trim(),
-                model: draft.model.trim(),
-                trim: draft.trim.trim(),
-                year: Number(draft.year) || item.year,
-                price: Number(draft.price) || item.price,
-                mileage: Number(draft.mileage) || item.mileage,
-                status: draft.status,
-                image: trimmedImage || item.image,
-              }
-            : item,
-        ),
-      );
+      const existing = inventory.find((item) => item.id === editingId);
+      await updateVehicle(editingId, {
+        make: draft.make.trim(),
+        model: draft.model.trim(),
+        trim: draft.trim.trim(),
+        year: Number(draft.year) || existing?.year || new Date().getFullYear(),
+        price: Number(draft.price) || existing?.price || 0,
+        mileage: Number(draft.mileage) || existing?.mileage || 0,
+        status: draft.status,
+        image: trimmedImage || existing?.image || EMPTY_DRAFT.image,
+      });
     } else {
       const newItem: InventoryItem = {
-        id: `vehicle-${Date.now()}`,
+        id: draftId,
         make: draft.make.trim(),
         model: draft.model.trim(),
         trim: draft.trim.trim() || "Base",
@@ -153,18 +165,18 @@ export default function InventoryPage() {
         status: draft.status,
         image: trimmedImage || EMPTY_DRAFT.image,
       };
-      setInventory((prev) => [newItem, ...prev]);
+      await addVehicle(newItem);
     }
 
     setModalOpen(false);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirmDeleteId !== id) {
       setConfirmDeleteId(id);
       return;
     }
-    setInventory((prev) => prev.filter((item) => item.id !== id));
+    await deleteVehicle(id);
     setConfirmDeleteId(null);
   };
 
@@ -230,7 +242,14 @@ export default function InventoryPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {filtered.map((item) => (
+            {loading && (
+              <tr>
+                <td colSpan={6} className="px-5 py-6 text-center text-sm text-slate-500">
+                  Cargando inventario…
+                </td>
+              </tr>
+            )}
+            {!loading && filtered.map((item) => (
               <tr key={item.id}>
                 <td className="px-5 py-3">
                   <div className="flex items-center gap-3">
@@ -321,6 +340,19 @@ export default function InventoryPage() {
               ))}
             </select>
           </DashboardField>
+          <DashboardField label="Subir Imagen">
+            <input
+              type="file"
+              accept="image/*"
+              disabled={uploading}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) void handleImageUpload(file);
+              }}
+              className={dashboardInputClass}
+            />
+            {uploading && <p className="text-xs text-slate-500">Subiendo imagen…</p>}
+          </DashboardField>
           <DashboardField label="URL de Imagen">
             <input
               value={draft.image}
@@ -335,7 +367,7 @@ export default function InventoryPage() {
           <button
             type="button"
             onClick={handleSave}
-            disabled={!isDraftValid}
+            disabled={!isDraftValid || uploading}
             className="mt-2 flex h-11 items-center justify-center rounded-xl bg-indigo-600 text-sm font-medium text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-indigo-600"
           >
             {editingId ? "Guardar Cambios" : "Agregar Vehículo"}
