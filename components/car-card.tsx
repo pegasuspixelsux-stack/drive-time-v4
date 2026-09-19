@@ -53,7 +53,7 @@ export function CarCard({
     return (
       <motion.article
         variants={fadeUp}
-        className="group relative flex flex-row overflow-hidden rounded-2xl bg-transparent"
+        className="group relative flex min-h-[280px] flex-row overflow-hidden rounded-2xl bg-transparent"
       >
         <Link
           href={`/inventory/${car.id}`}
@@ -66,7 +66,7 @@ export function CarCard({
           />
         </Link>
 
-        <div className="relative aspect-square w-2/5 flex-shrink-0 self-start overflow-hidden bg-surface-2 sm:aspect-auto sm:w-1/2 sm:self-stretch">
+        <div className="relative aspect-square w-2/5 flex-shrink-0 self-start overflow-hidden bg-surface-2 sm:w-1/2">
           <Image
             src={car.image}
             alt={`${car.year} ${car.make} ${car.model} ${car.trim}`}
@@ -74,6 +74,12 @@ export function CarCard({
             sizes="(min-width: 640px) 25vw, 40vw"
             className="object-cover object-[center_33%] transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-[1.08]"
           />
+          <span
+            className="absolute left-1/2 top-2 -translate-x-1/2 whitespace-nowrap text-[1rem] font-semibold tracking-tight text-white sm:text-[1.2rem]"
+            style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}
+          >
+            DriveTime
+          </span>
           <span className="glass absolute left-3 top-3 rounded-full px-3 py-1 text-[0.75rem] font-medium text-foreground">
             {BODY_TYPE_LABELS[car.bodyType] ?? car.bodyType}
           </span>
@@ -138,10 +144,17 @@ export function CarCard({
         className="object-cover object-[center_33%] transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-[1.08]"
       />
 
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.9)_0%,rgba(0,0,0,0.9)_15%,rgba(0,0,0,0)_33%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.9)_0%,rgba(0,0,0,0.9)_22%,rgba(0,0,0,0)_48%)]" />
 
       <span className="glass absolute left-3 top-3 z-10 rounded-full px-3 py-1 text-[0.75rem] font-medium text-white">
         {BODY_TYPE_LABELS[car.bodyType] ?? car.bodyType}
+      </span>
+
+      <span
+        className="absolute left-1/2 top-3 z-10 -translate-x-1/2 whitespace-nowrap text-[1.4rem] font-semibold tracking-tight text-white"
+        style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}
+      >
+        DriveTime
       </span>
 
       <Link

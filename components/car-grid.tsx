@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Grid2x2, LayoutGrid } from "lucide-react";
 import { useInventory } from "@/lib/firebase/inventory";
-import { CarCard, type CardLayout } from "@/components/car-card";
+import { CarCard } from "@/components/car-card";
 import { fadeUp, staggerContainer } from "@/lib/motion";
 import type { InventoryItem } from "@/lib/dashboard-data";
 
@@ -17,19 +16,13 @@ const BODY_TYPE_LABELS: Record<(typeof BODY_TYPE_PILLS)[number], string> = {
   Coupe: "Cupé",
 };
 
-type GridDensity = "comfortable" | "compact";
-
 export function CarGrid({ initialCars }: { initialCars?: InventoryItem[] }) {
   const { items: cars, loading, error } = useInventory(initialCars);
   const [bodyType, setBodyType] =
     useState<(typeof BODY_TYPE_PILLS)[number]>("All");
-  const [density, setDensity] = useState<GridDensity>("comfortable");
 
   const visibleCars =
     bodyType === "All" ? cars : cars.filter((car) => car.bodyType === bodyType);
-
-  const cardLayout: CardLayout =
-    density === "comfortable" ? "split" : "portrait";
 
   return (
     <section id="inventory" className="bg-background px-3 pb-28 pt-[5%] sm:px-6 lg:px-8">
@@ -50,52 +43,21 @@ export function CarGrid({ initialCars }: { initialCars?: InventoryItem[] }) {
           </p>
         </motion.div>
 
-        <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap gap-2">
-            {BODY_TYPE_PILLS.map((type) => (
-              <button
-                key={type}
-                type="button"
-                onClick={() => setBodyType(type)}
-                className={`rounded-full border px-4 py-2 text-[0.85rem] font-medium transition-colors duration-200 ${
-                  bodyType === type
-                    ? "border-foreground bg-foreground text-accent-foreground"
-                    : "border-border-strong text-muted hover:text-foreground"
-                }`}
-              >
-                {BODY_TYPE_LABELS[type]}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex shrink-0 items-center gap-1 rounded-full border border-border-strong p-1">
+        <div className="mb-8 flex flex-wrap gap-2">
+          {BODY_TYPE_PILLS.map((type) => (
             <button
+              key={type}
               type="button"
-              aria-label="Vista amplia"
-              aria-pressed={density === "comfortable"}
-              onClick={() => setDensity("comfortable")}
-              className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors duration-200 ${
-                density === "comfortable"
-                  ? "bg-foreground text-accent-foreground"
-                  : "text-muted hover:text-foreground"
+              onClick={() => setBodyType(type)}
+              className={`rounded-full border px-4 py-2 text-[0.85rem] font-medium transition-colors duration-200 ${
+                bodyType === type
+                  ? "border-foreground bg-foreground text-accent-foreground"
+                  : "border-border-strong text-muted hover:text-foreground"
               }`}
             >
-              <Grid2x2 size={16} />
+              {BODY_TYPE_LABELS[type]}
             </button>
-            <button
-              type="button"
-              aria-label="Vista compacta"
-              aria-pressed={density === "compact"}
-              onClick={() => setDensity("compact")}
-              className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors duration-200 ${
-                density === "compact"
-                  ? "bg-foreground text-accent-foreground"
-                  : "text-muted hover:text-foreground"
-              }`}
-            >
-              <LayoutGrid size={16} />
-            </button>
-          </div>
+          ))}
         </div>
 
         {error && (
@@ -107,14 +69,10 @@ export function CarGrid({ initialCars }: { initialCars?: InventoryItem[] }) {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-80px" }}
-          className={`grid gap-3 sm:gap-6 ${
-            density === "compact"
-              ? "grid-cols-2 md:grid-cols-4"
-              : "grid-cols-1 md:grid-cols-2"
-          }`}
+          className="grid grid-cols-2 gap-3 sm:gap-6 md:grid-cols-4"
         >
           {!loading && visibleCars.map((car) => (
-            <CarCard key={car.id} car={car} layout={cardLayout} />
+            <CarCard key={car.id} car={car} layout="portrait" />
           ))}
         </motion.div>
 

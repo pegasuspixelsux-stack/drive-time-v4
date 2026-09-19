@@ -148,7 +148,8 @@ export default function InventoryPage() {
     try {
       const url = await uploadInventoryImage(file, draftId);
       setDraft((d) => ({ ...d, image: url }));
-    } catch {
+    } catch (error) {
+      console.error("uploadInventoryImage failed:", error);
       setErrors({ image: "No se pudo subir la imagen. Intenta de nuevo." });
     } finally {
       setUploading(false);
