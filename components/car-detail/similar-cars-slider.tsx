@@ -33,25 +33,23 @@ export function SimilarCarsSlider({ cars }: { cars: Car[] }) {
           <motion.div key={car.id} variants={fadeUp} className="snap-start">
             <Link
               href={`/inventory/${car.id}`}
-              className="group block w-64 flex-shrink-0 overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-colors hover:border-zinc-300"
+              className="group relative block h-72 w-64 flex-shrink-0 overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-100 transition-colors hover:border-zinc-300"
             >
-              <div className="relative h-40 w-full overflow-hidden bg-zinc-100">
-                <Image
-                  src={car.image}
-                  alt={`${car.year} ${car.make} ${car.model}`}
-                  fill
-                  sizes="256px"
-                  className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
-                />
-              </div>
-              <div className="p-4">
-                <p className="font-semibold text-zinc-900">
+              <Image
+                src={car.image}
+                alt={`${car.year} ${car.make} ${car.model}`}
+                fill
+                sizes="256px"
+                className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-4 pt-14">
+                <p className="font-semibold text-white">
                   {car.make} {car.model}
                 </p>
-                <p className="mt-1 text-[0.82rem] text-zinc-500">
+                <p className="mt-1 text-[0.82rem] text-white/75">
                   {mileageFormat.format(car.mileage)} km
                 </p>
-                <p className="mt-2 text-[0.95rem] font-semibold text-zinc-900">
+                <p className="mt-2 text-[0.95rem] font-semibold text-white">
                   {currency.format(car.price)}
                 </p>
               </div>
