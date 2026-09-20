@@ -12,16 +12,16 @@ export function EditorialDescription({
   return (
     <div className="mx-auto max-w-[1000px] px-6 py-14 sm:px-8">
       <div className="mx-auto max-w-2xl">
-        <h2 className="font-serif text-3xl font-semibold leading-tight tracking-tight text-zinc-900 sm:text-4xl">
+        <h2 className="font-serif text-3xl font-semibold leading-tight tracking-tight text-foreground sm:text-4xl">
           {editorial.headline}
         </h2>
-        <p className="mt-4 text-lg leading-relaxed text-zinc-500">
+        <p className="mt-4 text-lg leading-relaxed text-muted">
           {editorial.dek}
         </p>
 
-        <div className="mt-8 flex flex-col gap-6 text-[1.05rem] leading-[1.9] text-zinc-700">
+        <div className="mt-8 flex flex-col gap-6 text-[1.05rem] leading-[1.9] text-foreground">
           <p>
-            <span className="float-left mr-2 font-serif text-6xl font-semibold leading-[0.8] text-zinc-900">
+            <span className="float-left mr-2 font-serif text-6xl font-semibold leading-[0.8] text-foreground">
               {dropCap}
             </span>
             {restOfFirstParagraph}

@@ -26,23 +26,23 @@ export function FeatureColumns({ features }: { features: CarFeatureGroup[] }) {
           <motion.div
             key={group.category}
             variants={fadeUp}
-            className="rounded-2xl border border-zinc-200 bg-white p-6"
+            className="rounded-2xl border border-border bg-surface p-6"
           >
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-100 text-zinc-900">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-2 text-foreground">
               <Icon size={18} />
             </span>
-            <h3 className="mt-4 text-[1.05rem] font-semibold text-zinc-900">
+            <h3 className="mt-4 text-[1.05rem] font-semibold text-foreground">
               {group.category}
             </h3>
             <ul className="mt-4 flex flex-col gap-2.5">
               {group.items.map((item) => (
                 <li
                   key={item}
-                  className="flex items-start gap-2 text-[0.9rem] text-zinc-600"
+                  className="flex items-start gap-2 text-[0.9rem] text-muted"
                 >
                   <CheckCircle2
                     size={15}
-                    className="mt-0.5 flex-shrink-0 text-zinc-400"
+                    className="mt-0.5 flex-shrink-0 text-muted-2"
                   />
                   <span>{item}</span>
                 </li>

@@ -45,10 +45,10 @@ export default async function CarDetailPage({
   const similarCars = getSimilarCars(items, car.id, car.bodyType);
 
   return (
-    <div data-theme="light" className="flex min-h-full flex-1 flex-col">
+    <div className="flex min-h-full flex-1 flex-col">
       <Navbar />
-      <main className="flex-1 bg-zinc-50 pt-24 sm:pt-28">
-        <CarSlideshow images={detail.images} />
+      <main className="flex-1 bg-background pt-24 sm:pt-28">
+        <CarSlideshow images={detail.images} car={car} />
         <CarHeaderInfo car={car} />
         {detail.editorial.paragraphs.length > 0 && (
           <EditorialDescription editorial={detail.editorial} />

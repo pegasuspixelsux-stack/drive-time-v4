@@ -50,6 +50,31 @@ const FUEL_TYPE_LABELS: Record<InventoryItem["fuelType"], string> = {
   Electric: "Eléctrico",
 };
 
+const FEATURE_OPTIONS: string[] = [
+  "Arranque sin llave (Smart Key)",
+  "Botón de encendido",
+  "Climatizador automático (bizona / trizona)",
+  "Asientos eléctricos",
+  "Asientos calefactables",
+  "Asientos ventilados",
+  "Techo solar / panorámico",
+  "Portón trasero eléctrico",
+  "Apple CarPlay / Android Auto inalámbrico",
+  "Cargador inalámbrico para celular",
+  "Tablero digital (Digital Cockpit)",
+  "Iluminación ambiental LED",
+  "Control de crucero adaptativo (ACC)",
+  "Frenado autónomo de emergencia (AEB)",
+  "Detector de punto ciego",
+  "Alerta de tráfico cruzado",
+  "Asistente de mantenimiento de carril",
+  "Cámara 360°",
+  "Sensores de estacionamiento",
+  "Vidrios polarizados / tintados de fábrica",
+  "Espejo retrovisor electrocrómico",
+  "Faros LED matriciales / adaptativos",
+];
+
 type DraftVehicle = {
   make: string;
   model: string;
@@ -64,6 +89,7 @@ type DraftVehicle = {
   bodyType: InventoryItem["bodyType"];
   color: string;
   colorHex: string;
+  features: string[];
 };
 
 const EMPTY_DRAFT: DraftVehicle = {
@@ -80,6 +106,7 @@ const EMPTY_DRAFT: DraftVehicle = {
   bodyType: "Sedan",
   color: "Jet Black",
   colorHex: "#0a0a0b",
+  features: [],
 };
 
 function toDraft(item: InventoryItem): DraftVehicle {
@@ -97,6 +124,7 @@ function toDraft(item: InventoryItem): DraftVehicle {
     bodyType: item.bodyType,
     color: item.color,
     colorHex: item.colorHex,
+    features: item.features ?? [],
   };
 }
 
@@ -184,6 +212,7 @@ export default function InventoryPage() {
         bodyType: draft.bodyType || existing?.bodyType || EMPTY_DRAFT.bodyType,
         color: draft.color.trim() || existing?.color || EMPTY_DRAFT.color,
         colorHex: draft.colorHex.trim() || existing?.colorHex || EMPTY_DRAFT.colorHex,
+        features: draft.features,
       });
     } else {
       const newItem: InventoryItem = {
@@ -201,11 +230,21 @@ export default function InventoryPage() {
         colorHex: draft.colorHex.trim() || EMPTY_DRAFT.colorHex,
         status: draft.status,
         image: trimmedImage || EMPTY_DRAFT.image,
+        features: draft.features,
       };
       await addVehicle(newItem);
     }
 
     setModalOpen(false);
+  };
+
+  const toggleFeature = (feature: string) => {
+    setDraft((d) => ({
+      ...d,
+      features: d.features.includes(feature)
+        ? d.features.filter((f) => f !== feature)
+        : [...d.features, feature],
+    }));
   };
 
   const handleDelete = async (id: string) => {
@@ -411,6 +450,24 @@ export default function InventoryPage() {
               <input value={draft.colorHex} onChange={(e) => setDraft((d) => ({ ...d, colorHex: e.target.value }))} className={dashboardInputClass} />
             </DashboardField>
           </div>
+          <DashboardField label="Características">
+            <div className="grid grid-cols-1 gap-x-4 gap-y-2 rounded-xl border border-slate-200 p-3 sm:grid-cols-2">
+              {FEATURE_OPTIONS.map((feature) => (
+                <label
+                  key={feature}
+                  className="flex cursor-pointer items-center gap-2 text-sm text-slate-700"
+                >
+                  <input
+                    type="checkbox"
+                    checked={draft.features.includes(feature)}
+                    onChange={() => toggleFeature(feature)}
+                    className="h-4 w-4 flex-shrink-0 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                  />
+                  {feature}
+                </label>
+              ))}
+            </div>
+          </DashboardField>
           <DashboardField label="Subir Imagen">
             <input
               type="file"

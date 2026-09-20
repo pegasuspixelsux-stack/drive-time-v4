@@ -3,14 +3,31 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion, type PanInfo } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import type { CarDetailImage } from "@/data/car-details";
+import type { Car } from "@/data/cars";
+import { InstagramGlyph } from "@/components/icons/instagram-glyph";
+import { shareCarToInstagram } from "@/lib/share/share-to-instagram";
 
 const SWIPE_THRESHOLD = 60;
 const VELOCITY_THRESHOLD = 400;
 
-export function CarSlideshow({ images }: { images: CarDetailImage[] }) {
+export function CarSlideshow({ images, car }: { images: CarDetailImage[]; car: Car }) {
   const [index, setIndex] = useState(0);
+  const [sharing, setSharing] = useState(false);
+
+  const handleShareToInstagram = async () => {
+    if (sharing) return;
+    setSharing(true);
+    try {
+      await shareCarToInstagram(car);
+    } catch {
+      // Composing/sharing the image failed silently from the visitor's point of
+      // view (no toast system on the public site) — the button just resets.
+    } finally {
+      setSharing(false);
+    }
+  };
 
   const goTo = (next: number) => {
     setIndex((next + images.length) % images.length);
@@ -29,7 +46,7 @@ export function CarSlideshow({ images }: { images: CarDetailImage[] }) {
 
   return (
     <div className="mx-auto max-w-[1000px] px-6 pt-8 sm:px-8">
-      <div className="relative aspect-square w-full overflow-hidden rounded-3xl bg-zinc-100 shadow-lg">
+      <div className="relative aspect-square w-full overflow-hidden rounded-3xl bg-surface-2 shadow-lg">
         <motion.div
           className="flex h-full w-full cursor-grab active:cursor-grabbing"
           drag="x"
@@ -53,6 +70,16 @@ export function CarSlideshow({ images }: { images: CarDetailImage[] }) {
             </div>
           ))}
         </motion.div>
+
+        <button
+          type="button"
+          onClick={handleShareToInstagram}
+          disabled={sharing}
+          aria-label="Compartir en Instagram"
+          className="absolute left-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-zinc-900 shadow-md transition-transform duration-200 hover:scale-105 disabled:cursor-wait"
+        >
+          {sharing ? <Loader2 size={18} className="animate-spin" /> : <InstagramGlyph size={18} />}
+        </button>
 
         {images.length > 1 && (
           <>

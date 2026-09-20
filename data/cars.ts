@@ -12,6 +12,7 @@ export interface Car {
   color: string;
   colorHex: string;
   image: string;
+  features?: string[];
 }
 
 export const cars: Car[] = [

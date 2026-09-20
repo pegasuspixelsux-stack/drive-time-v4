@@ -10,7 +10,7 @@ import { createLead } from "@/lib/firebase/leads";
 const WHATSAPP_NUMBER = "14155550148";
 
 const fieldClass =
-  "h-12 w-full rounded-xl border border-zinc-200 bg-white px-4 text-[0.9rem] text-zinc-900 placeholder:text-zinc-400 transition-colors duration-200 focus-visible:border-zinc-900 focus-visible:outline-none";
+  "h-12 w-full rounded-xl border border-border-strong bg-surface px-4 text-[0.9rem] text-foreground placeholder:text-muted-2 transition-colors duration-200 focus-visible:border-foreground/50 focus-visible:outline-none";
 
 interface InquiryDraft {
   name: string;
@@ -80,14 +80,14 @@ export function CarInquiryForm({ car }: { car: Car }) {
         viewport={{ once: true, margin: "-80px" }}
         className="mx-auto max-w-[1000px] px-6 py-14 sm:px-8"
       >
-        <div className="mx-auto flex max-w-md flex-col items-center gap-3 rounded-2xl border border-zinc-200 bg-white p-10 text-center">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 text-zinc-900">
+        <div className="mx-auto flex max-w-md flex-col items-center gap-3 rounded-2xl border border-border bg-surface p-10 text-center">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-2 text-foreground">
             <CheckCircle2 size={22} />
           </span>
-          <h3 className="text-[1.05rem] font-semibold text-zinc-900">
+          <h3 className="text-[1.05rem] font-semibold text-foreground">
             Consulta recibida
           </h3>
-          <p className="text-[0.9rem] text-zinc-500">
+          <p className="text-[0.9rem] text-muted">
             Un asesor se pondrá en contacto en breve sobre el {car.year} {car.make}{" "}
             {car.model}.
           </p>
@@ -97,7 +97,7 @@ export function CarInquiryForm({ car }: { car: Car }) {
               setDraft(EMPTY_DRAFT);
               setSubmitted(false);
             }}
-            className="mt-2 text-[0.85rem] font-medium text-zinc-900 underline decoration-zinc-300 underline-offset-4"
+            className="mt-2 text-[0.85rem] font-medium text-foreground underline decoration-border-strong underline-offset-4"
           >
             Enviar otra consulta
           </button>
@@ -114,18 +114,18 @@ export function CarInquiryForm({ car }: { car: Car }) {
       viewport={{ once: true, margin: "-80px" }}
       className="mx-auto max-w-[1000px] px-6 py-14 sm:px-8"
     >
-      <div className="mx-auto max-w-2xl rounded-2xl border border-zinc-200 bg-white p-8">
-        <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">
+      <div className="mx-auto max-w-2xl rounded-2xl border border-border bg-surface p-8">
+        <h2 className="text-2xl font-semibold tracking-tight text-foreground">
           ¿Te interesa este vehículo?
         </h2>
-        <p className="mt-2 text-[0.9rem] text-zinc-500">
+        <p className="mt-2 text-[0.9rem] text-muted">
           Envía tu consulta y un asesor se pondrá en contacto contigo.
         </p>
 
         <form onSubmit={handleEmailSubmit} className="mt-6 flex flex-col gap-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-2">
-              <label className="text-[0.8rem] font-medium text-zinc-600">Nombre</label>
+              <label className="text-[0.8rem] font-medium text-muted">Nombre</label>
               <input
                 value={draft.name}
                 onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))}
@@ -135,7 +135,7 @@ export function CarInquiryForm({ car }: { car: Car }) {
               {errors.name && <p className="text-[0.78rem] text-red-500">{errors.name}</p>}
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-[0.8rem] font-medium text-zinc-600">Correo electrónico</label>
+              <label className="text-[0.8rem] font-medium text-muted">Correo electrónico</label>
               <input
                 type="email"
                 value={draft.email}
@@ -148,7 +148,7 @@ export function CarInquiryForm({ car }: { car: Car }) {
           </div>
 
           <div className="flex flex-col gap-2">
-            <label className="text-[0.8rem] font-medium text-zinc-600">Teléfono</label>
+            <label className="text-[0.8rem] font-medium text-muted">Teléfono</label>
             <input
               type="tel"
               value={draft.phone}
@@ -159,7 +159,7 @@ export function CarInquiryForm({ car }: { car: Car }) {
           </div>
 
           <div className="flex flex-col gap-2">
-            <label className="text-[0.8rem] font-medium text-zinc-600">Mensaje</label>
+            <label className="text-[0.8rem] font-medium text-muted">Mensaje</label>
             <textarea
               value={draft.message}
               onChange={(e) => setDraft((d) => ({ ...d, message: e.target.value }))}
@@ -178,7 +178,7 @@ export function CarInquiryForm({ car }: { car: Car }) {
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
               transition={{ duration: 0.15, ease: "easeOut" }}
-              className="flex h-12 items-center justify-center gap-2 rounded-xl bg-zinc-900 text-[0.9rem] font-medium text-white transition-colors hover:bg-zinc-800"
+              className="flex h-12 items-center justify-center gap-2 rounded-xl bg-foreground text-[0.9rem] font-medium text-accent-foreground"
             >
               <Send size={16} />
               Enviar por email
