@@ -41,7 +41,7 @@ export function SimilarCarsSlider({ cars }: { cars: Car[] }) {
                   alt={`${car.year} ${car.make} ${car.model}`}
                   fill
                   sizes="256px"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
               <div className="p-4">
